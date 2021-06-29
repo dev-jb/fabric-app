@@ -1,0 +1,23 @@
+version: "2"
+
+networks:
+  saas:
+
+services:
+  intermediate.ca:
+    container_name: $ICA_NAME.$ICA_HOST
+    image: hyperledger/fabric-ca:$CA_IMAGE
+    command: sh -c 'fabric-ca-server start -u https://$ICA_NAME.$ICA_HOST:$ICA_PASSWORD@root.ca.$ICA_HOST:7053 -b $ICA_USER_NAME:$ICA_PASSWORD --intermediate.tls.certfiles /etc/hyperledger/fabric-ca-server/tls-cert.pem --csr.hosts 0.0.0.0'
+    environment:
+      - FABRIC_CA_HOME=/etc/hyperledger/fabric-ca-server/crypto
+      - FABRIC_CA_PORT=$ICA_PORT
+      - FABRIC_CA_SERVER_CA_NAME=$ICA_NAME.$ICA_HOST
+      - FABRIC_CA_SERVER_TLS_ENABLED=true
+      - FABRIC_CA_SERVER_DEBUG=true
+    ports:
+      - "$ICA_PORT:$ICA_PORT"
+    volumes:
+      - ./fabric-ca-intermediate/:/etc/hyperledger/fabric-ca-server/
+    restart: always
+    networks:
+      - saas
